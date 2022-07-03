@@ -1,8 +1,10 @@
-const newFormHandler = asyn function (event) {
+
+const newFormHandler = async function (event) {
     event.preventDefault();
 
-    const title = document.querySelector('input-[name="post-title"]').value;
+    const title = document.querySelector('input[name="post-title"]').value;
     const body = document.querySelector('textarea[name="post-body"]').value;
+
     const token = localStorage.getItem("token");
     await fetch(`/api/post`, {
         method: "POST",
@@ -10,9 +12,8 @@ const newFormHandler = asyn function (event) {
             title,
             body
         }),
-
         headers: {
-            "Content-type": "application/json",
+            "Content-Type": "application/json",
             authorization: `Bearer ${token}`
         }
     });
@@ -21,5 +22,5 @@ const newFormHandler = asyn function (event) {
 };
 
 document
-.querySelector("#new-post-form")
-.addEventListener("submit", newFormHandler);
+    .querySelector("#new-post-form")
+    .addEventListener("submit", newFormHandler);
