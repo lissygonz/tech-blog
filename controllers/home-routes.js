@@ -1,10 +1,58 @@
-const router = require('express').Router();
+const router =require("express").Router();
+const res = require("express/lib/response");
+const { Post, Comment, User } = require("../models/");
+const { post } = require("./dashboard-routes");
 
+//gets posts from Homepage
+router.get("/", (req, res) => {
+    Post.findAll({
+        include: [User],
+    })
+    .then((dbPostData) => {
+        const posts = dbPostData.map((post) => post.get({ plain:true}));
 
-router.get('/dashboard', (req,res) => res.render('dashboard'));
-router.get('/signup', (req,res) => res.render('signup'));
-router.get('/login', (req,res) => res.render('login'));
-router.get('/', (req,res) => res.render('all-posts'));
+        res.render("all-posts", { posts });
+    })
+
+    .catch((err) => {
+        res.status(500).json(err);
+    });
+});
+
+//gets single posts
+router.get("/post/:id", (req,res) => {
+    Post.findByPk(req.params.id, {
+        include: [
+            User,
+            {
+                model: Comment,
+                include: [User],
+            },
+        ],
+    })
+
+    .then((dbPostData) => {
+        if(dbPostData) {
+            const post = dbPostData.get({ plain:true});
+
+            res.render("single-post", { post});
+        } else {
+            res.status(404).end();
+        }
+    })
+    .catch((err) => {
+        res.status(500).json(err);
+    });
+
+});
+
+router.get("/signup", (req, res) => {
+    if(req.session.loggedIn) {
+        res.redirect("/");
+        return;
+    }
+    res.render("signup");
+});
 
 module.exports = router;
 
