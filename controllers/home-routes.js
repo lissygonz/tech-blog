@@ -1,4 +1,4 @@
-const router =require("express").Router();
+const router = require("express").Router();
 const res = require("express/lib/response");
 const { Post, Comment, User } = require("../models/");
 const { post } = require("./dashboard-routes");
@@ -8,19 +8,18 @@ router.get("/", (req, res) => {
     Post.findAll({
         include: [User],
     })
-    .then((dbPostData) => {
-        const posts = dbPostData.map((post) => post.get({ plain:true}));
+        .then((dbPostData) => {
+            const posts = dbPostData.map((post) => post.get({ plain: true }));
 
-        res.render("all-posts", { posts });
-    })
-
-    .catch((err) => {
-        res.status(500).json(err);
-    });
+            res.render("all-posts", { posts });
+        })
+        .catch((err) => {
+            res.status(500).json(err);
+        });
 });
 
 //gets single posts
-router.get("/post/:id", (req,res) => {
+router.get("/post/:id", (req, res) => {
     Post.findByPk(req.params.id, {
         include: [
             User,
@@ -30,29 +29,22 @@ router.get("/post/:id", (req,res) => {
             },
         ],
     })
+        .then((dbPostData) => {
+            if (dbPostData) {
+                const post = dbPostData.get({ plain: true });
 
-    .then((dbPostData) => {
-        if(dbPostData) {
-            const post = dbPostData.get({ plain:true});
-
-            res.render("single-post", { post});
-        } else {
-            res.status(404).end();
-        }
-    })
-    .catch((err) => {
-        res.status(500).json(err);
-    });
-
+                res.render("single-post", { post });
+            } else {
+                res.status(404).end();
+            }
+        })
+        .catch((err) => {
+            res.status(500).json(err);
+        });
 });
 
-router.get("/signup", (req, res) => {
-    if(req.session.loggedIn) {
-        res.redirect("/");
-        return;
-    }
-    res.render("signup");
-});
+router.get("/signup", (req, res) => res.render("signup"));
+
 
 module.exports = router;
 
